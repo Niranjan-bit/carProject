@@ -3,10 +3,81 @@
 <head>
     <title>Available Cars</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .logout-btn {
+            background-color: #ff5252;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .logout-btn:hover {
+            background-color: #ff1a1a;
+        }
+
+        .search-sort {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .sort-btn {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .sort-btn:hover {
+            background-color: #45a049;
+        }
+
         .product-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
 
         .product-table th, .product-table td {
@@ -20,7 +91,7 @@
         }
 
         .product-table tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #f9f9f9;
         }
 
         .popup-box {
@@ -63,10 +134,19 @@
             z-index: 999;
         }
     </style>
-    
 </head>
 <body>
-    <h1>Available Cars</h1>
+<div class="container">
+    <div class="header">
+        <h1>Available Cars</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="search-sort">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by brand or name..." onkeyup="search()">
+        <button class="sort-btn" onclick="sortTable()">Sort by Price</button>
+    </div>
+
     <table class="product-table">
         <thead>
             <tr>
@@ -92,96 +172,94 @@
         </tbody>
     </table>
 
-    <!-- The popup box -->
-    <div id="popupBox" class="popup-box">
-        <span class="close-button" onclick="hidePopup()">&times;</span>
-        <h2 id="carName"></h2>
-        <p id="carBrand"></p>
-        <p id="carPrice"></p>
-        <img id="carImage" class="popup-img" src="" alt="Car Image">
-        <p id="carDescription"></p>
-        <button type="button" onclick="bookCar()">Buy Car</button>
+    <!-- The popup box, small box, and message box remain the same -->
+     <div class="popup-box" id="popupBox">
+        <span class="close-button" onclick="closePopup()">×</span>
+        <center><h2 id="popupTitle"></h2>
+        <p id="popupBrand"></p>
+        <p id="popupPrice"></p>
+        <p id="popupDescription"></p>
+        <img id="popupImage" class="popup-img">
+        <button onclick="buy()">Buy</button></center>
+        
     </div>
+</div>
 
-    <!-- The small box -->
-    <div id="smallBox" class="popup-box" style="max-width: 50%;">
-        <span class="close-button" onclick="hideSmallBox()">&times;</span>
-        <img id="carImageSmall" class="popup-img" src="" alt="Car Image" style="max-width: 100%; height: auto;">
-        <h2 id="carNameSmall"></h2>
-        <p id="carBrandSmall"></p>
-        <p id="carPriceSmall"></p>
-        <p id="carDescriptionSmall"></p>
-        <button type="button" onclick="bookCarSmall()">Buy Car</button>
-    </div>
+<script>
+function logout() {
+    // Placeholder function for logout
+    console.log("Logout button clicked");
+    // Implement logout functionality here
+}
 
-    <!-- Message box for congratulations message -->
-    <div id="messageBox" class="message-box">
-        <span class="close-button" onclick="hideMessageBox()">&times;</span>
-        <h2>Congratulations!</h2>
-        <p>The selected car has been booked.</p>
-    </div>
-
-    <script>
-        function showPopup(button) {
-            var row = button.parentNode.parentNode;
-            var cells = row.getElementsByTagName("td");
-            var carName = cells[1].innerText;
-            var carBrand = cells[0].innerText;
-            var carPrice = cells[2].innerText;
-            var carImage = cells[3].querySelector("img").src;
-            var carDescription = cells[4].innerText;
-            document.getElementById("carName").innerText = carName;
-            document.getElementById("carBrand").innerText = "Brand: " + carBrand;
-            document.getElementById("carPrice").innerText = "Price: ₹" + carPrice;
-            document.getElementById("carImage").src = carImage;
-            document.getElementById("carDescription").innerText = carDescription;
-            document.getElementById("popupBox").style.display = "block";
-            button.disabled = true; // Disable the view more button once clicked
+function search() {
+    // Get input value
+    var input = document.getElementById("searchInput").value.toUpperCase();
+    // Get table rows
+    var rows = document.getElementsByTagName("tr");
+    // Loop through rows
+    for (var i = 0; i < rows.length; i++) {
+        var brand = rows[i].getElementsByTagName("td")[0];
+        var name = rows[i].getElementsByTagName("td")[1];
+        if (brand || name) {
+            if (brand.innerHTML.toUpperCase().indexOf(input) > -1 || name.innerHTML.toUpperCase().indexOf(input) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
         }
+    }
+}
 
-        function hidePopup() {
-            document.getElementById("popupBox").style.display = "none";
+function sortTable() {
+    var table, rows, switching, i, x, y, shouldSwitch;
+    table = document.querySelector(".product-table");
+    switching = true;
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("td")[2];
+            y = rows[i + 1].getElementsByTagName("td")[2];
+            if (parseInt(x.innerHTML.replace(/\D/g, "")) > parseInt(y.innerHTML.replace(/\D/g, ""))) {
+                shouldSwitch = true;
+                break;
+            }
         }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+        }
+    }
+}
 
-        function bookCar() {
-            // Display congratulations message
-            document.getElementById("messageBox").style.display = "block";
-            hidePopup(); // Hide the popup box after booking
-            // You can add further logic here, such as removing the booked car row from the table
-            // Example: document.getElementById("selectedCarRow").remove();
-        }
+function showPopup(button) {
+    var row = button.parentNode.parentNode;
+    var brand = row.getElementsByTagName("td")[0].innerText;
+    var name = row.getElementsByTagName("td")[1].innerText;
+    var price = row.getElementsByTagName("td")[2].innerText;
+    var description = row.getElementsByTagName("td")[4].innerText;
+    var imageSrc = row.getElementsByTagName("img")[0].src;
 
-        function hideMessageBox() {
-            document.getElementById("messageBox").style.display = "none";
-        }
+    document.getElementById("popupTitle").innerText = name;
+    document.getElementById("popupBrand").innerText = "Brand: " + brand;
+    document.getElementById("popupPrice").innerText = "Price: " + price;
+    document.getElementById("popupDescription").innerText = "Description: " + description;
+    document.getElementById("popupImage").src = imageSrc;
 
-        function showSmallBox(button) {
-            var row = button.parentNode.parentNode;
-            var cells = row.getElementsByTagName("td");
-            var carName = cells[1].innerText;
-            var carBrand = cells[0].innerText;
-            var carPrice = cells[2].innerText;
-            var carImage = cells[3].querySelector("img").src;
-            var carDescription = cells[4].innerText;
-            document.getElementById("carNameSmall").innerText = carName;
-            document.getElementById("carBrandSmall").innerText = "Brand: " + carBrand;
-            document.getElementById("carPriceSmall").innerText = "Price: ₹" + carPrice;
-            document.getElementById("carImageSmall").src = carImage;
-            document.getElementById("carDescriptionSmall").innerText = "Description: " + carDescription;
-            document.getElementById("smallBox").style.display = "block";
-            button.disabled = true; // Disable the view more button once clicked
-        }
+    var popupBox = document.getElementById("popupBox");
+    popupBox.style.display = "block";
+}
 
-        function hideSmallBox() {
-            document.getElementById("smallBox").style.display = "none";
-        }
+function closePopup() {
+    var popupBox = document.getElementById("popupBox");
+    popupBox.style.display = "none";
+}
 
-        function bookCarSmall() {
-            // Add your logic to handle booking the car here
-            // For example, you can display a confirmation message
-            alert("Car booked!");
-            hideSmallBox(); // Hide the small box after booking
-        }
-    </script>
+function buy() {
+    alert("Car has been booked!");
+}
+</script>
 </body>
 </html>

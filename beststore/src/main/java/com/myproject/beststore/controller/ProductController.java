@@ -52,12 +52,12 @@ public class ProductController {
 	@PostMapping("/create")
 	public String createProduct(
 			@Valid @ModelAttribute ProductDTO productDto,
-	        BindingResult result // allows us to check if productDto has any validation errors
+	        BindingResult result,  @RequestParam("imageFile") MultipartFile imageFile  // allows us to check if productDto has any validation errors
 	) {
 	    if (result.hasErrors()) {
 	    	return "redirect:/products/create";
 	    }
-	    
+	  
 	    
 	    Product product = new Product();
 	    product.setName(productDto.getName());

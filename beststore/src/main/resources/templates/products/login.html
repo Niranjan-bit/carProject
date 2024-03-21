@@ -38,7 +38,11 @@
 </head>
 <body>
   <div class="container">
-    <h2 style="text-align: center;">Login</h2>
+    <h2 style="text-align: center;">User Login</h2>
+    
+        	<div style="color:red;" role="alert">
+        	<center><span th:text="${status}"> </span></center>
+        </div>
     <form id="loginForm" th:action="@{/userlogin}" method="post">
       <div class="form-group">
         <label for="username">Username:</label>

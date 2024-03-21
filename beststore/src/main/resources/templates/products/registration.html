@@ -40,6 +40,11 @@
 <body>
   <div class="container">
     <h2 style="text-align: center;">User Registration</h2>
+    
+        	<div style="color:red;" role="alert">
+        	<center><span th:text="${status}"> </span></center>
+        </div>
+        
     <form action="registration_process" method="post"  th:action="@{/reg}">
       <div class="form-group">
         <label for="name">Name:</label>

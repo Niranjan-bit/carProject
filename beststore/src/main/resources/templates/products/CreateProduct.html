@@ -2,29 +2,38 @@
 <head>
     <title>Add</title>
     <style>
-        .text-danger {
-            color: red;
-        }
+         .container {
+        border: 2px solid #ccc;
+        padding: 20px;
+        border-radius: 10px;
+        max-width: 600px; /* Adjust max-width as needed */
+        margin: 0 auto; /* Center the container */
+    }
 
-        h3 {
-            color: red;
-        }
+    .text-danger {
+        color: red;
+    }
 
-        body {
-            text-align: center;
-            padding: 30px;
-            font-size: 35px;
-        }
+    h3 {
+        color: red;
+    }
 
-        form {
-            font-size: 30px;
-            color: black;
-        }
+    body {
+        text-align: center;
+        padding: 30px;
+        font-size: 35px;
+    }
+
+    form {
+        font-size: 30px;
+        color: black;
+    }
+        
     </style>
 </head>
 <body>
 <h3>Add Car</h3>
-<div>
+<div class="container">
     <form method="post" action="/products/create" enctype="multipart/form-data" th:object="${productDto}">
 
 

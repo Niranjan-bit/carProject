@@ -69,6 +69,11 @@
 </head>
 <body>
     <div class="container">
+    
+    	<div style="color:red;" role="alert">
+        	<center><span th:text="${status}"> </span></center>
+        </div>
+        
         <h2>Admin Login</h2>
         <form th:action="@{/adminlogin}" method="post">
             <label for="username">Username:</label>

@@ -37,12 +37,13 @@ public class UserController {
 	}
     
     @PostMapping("/userlogin")
-    public String login(@RequestParam("username") String username, @RequestParam("password")String password) {
+    public String login(@RequestParam("username") String username, @RequestParam("password")String password, Model m) {
     	User u=repo.findByUsernameAndPassword(username, password);
     	if(u!=null) {
     		return "redirect:/view";
     	}
     	else {
+    		m.addAttribute("status","Data not found!");
     		return "/products/login";
     	}
     	
