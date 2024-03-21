@@ -35,7 +35,7 @@ public class AdminController {
     public String login(@RequestParam("username") String username, @RequestParam("password")String password,Model m) {
     	Admin a=repo.findByUsernameAndPassword(username, password);
     	if(a!=null) {
-    		return "/products/index";    				}
+    		return "redirect:/products/ ";    				}
     	else {
     		m.addAttribute("status","Username not found!");
     		return "/products/adminLogin";

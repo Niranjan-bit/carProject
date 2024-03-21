@@ -29,7 +29,7 @@ public class UserController {
 	public String userRegister(@ModelAttribute User u, Model model) {
 	    // Check if the email or username already exists
 	    if(repo.existsByEmail(u.getEmail()) || repo.existsByUsername(u.getUsername())) {
-	        model.addAttribute("error", "Email or username already exists.");
+	    	model.addAttribute("error", "Email or username already exists.");
 	        return "/products/registration"; // Return to the registration page with an error message
 	    }
 	    repo.save(u);
