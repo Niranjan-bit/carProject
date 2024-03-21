@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>Add</title>
+    <style>
+        .text-danger {
+            color: red;
+        }
+
+        h3 {
+            color: red;
+        }
+
+        body {
+            text-align: center;
+            padding: 30px;
+            font-size: 35px;
+        }
+
+        form {
+            font-size: 30px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<h3>Add Car</h3>
+<div>
+    <form method="post" action="/products/create" enctype="multipart/form-data" th:object="${productDto}">
+
+
+        <input type="text" th:field="${productDto.name}" placeholder="Car name" required>
+        <p th:if="${#fields.hasErrors('name')}" th:errorclass="text-danger" th:errors="${productDto.name}">Required</p>
+
+
+        <br>
+        <input placeholder="Brand name" th:field="${productDto.brand}" required>
+        <p th:if="${#fields.hasErrors('brand')}" th:errorclass="text-danger" th:errors="${productDto.brand}">Required</p>
+        <br>
+
+        <input placeholder="Price" th:field="${productDto.price}" required>
+        <p th:if="${#fields.hasErrors('price')}" th:errorclass="text-danger" th:errors="${productDto.price}">Required</p>
+        <br>
+
+        <!-- Other input fields -->
+        <input type="file" name="imageFile" accept="image/*" required>
+        <!-- Add a file input field for image upload -->
+        <br>
+        <textarea rows="" cols="" placeholder="Description" th:field="${productDto.description}" required></textarea>
+        <p th:if="${#fields.hasErrors('description')}" th:errorclass="text-danger" th:errors="${productDto.description}">Required</p>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a class="btn-primary" href="/products">Cancel</a>
+    </form>
+
+</div>
+</body>
+</html>

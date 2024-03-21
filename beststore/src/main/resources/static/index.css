@@ -1,0 +1,14 @@
+body{
+	background-color: #FAFAFA;
+	color: #333;
+	text-align: center;
+	padding: 30px;
+	font-size: 25px;	
+}
+
+h2{
+	text-align: center;
+	color: orange;
+	font: italic;
+	font-weight: bold;
+}

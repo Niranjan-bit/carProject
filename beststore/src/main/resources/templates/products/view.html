@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Available Cars</title>
+    <style>
+        .product-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .product-table th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+
+        .product-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .popup-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            z-index: 999;
+            max-width: 50%;
+            max-height: 50%;
+            overflow: auto;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+        }
+
+        .popup-img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            padding: 20px;
+            display: none;
+            z-index: 999;
+        }
+    </style>
+    
+</head>
+<body>
+    <h1>Available Cars</h1>
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Brand</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.brand}"></td>
+                <td th:text="${product.name}"></td>
+                <td> ₹<span th:text="${product.price}"></span></td>
+                <td><img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="100"></td>
+                <td th:text="${product.description}"></td>
+                <td>
+                    <button type="button" onclick="showPopup(this)">View More</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- The popup box -->
+    <div id="popupBox" class="popup-box">
+        <span class="close-button" onclick="hidePopup()">&times;</span>
+        <h2 id="carName"></h2>
+        <p id="carBrand"></p>
+        <p id="carPrice"></p>
+        <img id="carImage" class="popup-img" src="" alt="Car Image">
+        <p id="carDescription"></p>
+        <button type="button" onclick="bookCar()">Buy Car</button>
+    </div>
+
+    <!-- The small box -->
+    <div id="smallBox" class="popup-box" style="max-width: 50%;">
+        <span class="close-button" onclick="hideSmallBox()">&times;</span>
+        <img id="carImageSmall" class="popup-img" src="" alt="Car Image" style="max-width: 100%; height: auto;">
+        <h2 id="carNameSmall"></h2>
+        <p id="carBrandSmall"></p>
+        <p id="carPriceSmall"></p>
+        <p id="carDescriptionSmall"></p>
+        <button type="button" onclick="bookCarSmall()">Buy Car</button>
+    </div>
+
+    <!-- Message box for congratulations message -->
+    <div id="messageBox" class="message-box">
+        <span class="close-button" onclick="hideMessageBox()">&times;</span>
+        <h2>Congratulations!</h2>
+        <p>The selected car has been booked.</p>
+    </div>
+
+    <script>
+        function showPopup(button) {
+            var row = button.parentNode.parentNode;
+            var cells = row.getElementsByTagName("td");
+            var carName = cells[1].innerText;
+            var carBrand = cells[0].innerText;
+            var carPrice = cells[2].innerText;
+            var carImage = cells[3].querySelector("img").src;
+            var carDescription = cells[4].innerText;
+            document.getElementById("carName").innerText = carName;
+            document.getElementById("carBrand").innerText = "Brand: " + carBrand;
+            document.getElementById("carPrice").innerText = "Price: ₹" + carPrice;
+            document.getElementById("carImage").src = carImage;
+            document.getElementById("carDescription").innerText = carDescription;
+            document.getElementById("popupBox").style.display = "block";
+            button.disabled = true; // Disable the view more button once clicked
+        }
+
+        function hidePopup() {
+            document.getElementById("popupBox").style.display = "none";
+        }
+
+        function bookCar() {
+            // Display congratulations message
+            document.getElementById("messageBox").style.display = "block";
+            hidePopup(); // Hide the popup box after booking
+            // You can add further logic here, such as removing the booked car row from the table
+            // Example: document.getElementById("selectedCarRow").remove();
+        }
+
+        function hideMessageBox() {
+            document.getElementById("messageBox").style.display = "none";
+        }
+
+        function showSmallBox(button) {
+            var row = button.parentNode.parentNode;
+            var cells = row.getElementsByTagName("td");
+            var carName = cells[1].innerText;
+            var carBrand = cells[0].innerText;
+            var carPrice = cells[2].innerText;
+            var carImage = cells[3].querySelector("img").src;
+            var carDescription = cells[4].innerText;
+            document.getElementById("carNameSmall").innerText = carName;
+            document.getElementById("carBrandSmall").innerText = "Brand: " + carBrand;
+            document.getElementById("carPriceSmall").innerText = "Price: ₹" + carPrice;
+            document.getElementById("carImageSmall").src = carImage;
+            document.getElementById("carDescriptionSmall").innerText = "Description: " + carDescription;
+            document.getElementById("smallBox").style.display = "block";
+            button.disabled = true; // Disable the view more button once clicked
+        }
+
+        function hideSmallBox() {
+            document.getElementById("smallBox").style.display = "none";
+        }
+
+        function bookCarSmall() {
+            // Add your logic to handle booking the car here
+            // For example, you can display a confirmation message
+            alert("Car booked!");
+            hideSmallBox(); // Hide the small box after booking
+        }
+    </script>
+</body>
+</html>
