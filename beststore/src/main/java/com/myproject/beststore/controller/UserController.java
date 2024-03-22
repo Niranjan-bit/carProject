@@ -20,6 +20,12 @@ public class UserController {
 	@Autowired
 	private UserRepository repo;
 	
+	@GetMapping("/login")
+	public String userLogin() {
+		 return "/products/login";
+	}
+	
+	
 	@GetMapping("/registration")
 	public String Register() {
 		return "/products/registration";

@@ -19,7 +19,6 @@
             color: black;
             font-weight: bold;
         }
-
         .container {
             max-width: 800px;
             margin: 0 auto;
@@ -85,7 +84,9 @@
                     <td th:text="${product.name}"></td>
                     <td> ₹<span th:text="${product.price}"></span></td>
                     <!-- Adjust the image source to include the correct path -->
-                    <td><img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.zigwheels.com%2Ftoyota-cars%2Fcamry&psig=AOvVaw1q3tu_NeItpzJaEgNhI6OJ&ust=1711099368326000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCNjbgYWEhYUDFQAAAAAdAAAAABAD.jpg" alt="Car Image"></td>
+                    <td>
+    <img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" alt="Car Image" style="width:304px;height:228px">
+</td>
                     <td th:text="${product.description}"></td>
                     <td style="white-space: nowrap">
                         <a class="btn btn-primary btn-sm" th:href="@{/products/edit(id=${product.id})}">Edit</a>

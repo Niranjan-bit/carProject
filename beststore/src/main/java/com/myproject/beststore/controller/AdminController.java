@@ -21,7 +21,7 @@ public class AdminController {
 
     @GetMapping("/")
     public String showLoginForm() {
-        return "/products/login"; // Points to login.html
+        return "/products/landingpage"; // Points to login.html
     }
    
     

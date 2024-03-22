@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarsHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+
+        .navbar-brand {
+            float: right;
+            padding: 15px 20px;
+            font-size: 20px;
+            color: #fff;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .navbar-brand:hover {
+            color: #ddd;
+        }
+
+        .hero-section {
+            background-image: url('https://blob.loancenter.com/media/2023/10/Best-Cars-to-Buy-Now-for-Future-Value.webp');
+            background-size: cover;
+            background-position: center;
+            height: calc(100vh - 60px); /* Subtracting navbar height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+        }
+
+        .login-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-button:hover {
+            background-color: #0056b3;
+        }
+        h1{
+        padding: 150px;}
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="navbar-brand">wheels.com</div>
+    </div>
+
+    <div class="hero-section">
+        <div>
+            <h1>.</h1>
+            <p>Find your dream car here!</p>
+            <a th:href="@{/login}" class="login-button">Buy Your Dream Car</a>
+        </div>
+    </div>
+</body>
+</html>
