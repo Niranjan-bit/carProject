@@ -7,7 +7,34 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f9f9f9;
+            background-color: #f8f4ff;
+        }
+ .btn {
+            font-size: 16px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: red;
+            border-color: #4caf50;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        .btn-danger {
+            background-color: #ff5252;
+            border-color: #ff5252;
+        }
+
+        .btn-danger:hover {
+            background-color: #ff1a1a;
         }
 
         .container {
@@ -29,20 +56,7 @@
             color: #333;
         }
 
-        .logout-btn {
-            background-color: #ff5252;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .logout-btn:hover {
-            background-color: #ff1a1a;
-        }
-
+     
         .search-sort {
             display: flex;
             justify-content: space-between;
@@ -102,7 +116,8 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: #f2f2f2;
-            border: 1px solid #ccc;
+            border: 5px solid green;
+            box-shadow: 2px solid blue;
             padding: 20px;
             display: none;
             z-index: 999;
@@ -139,7 +154,7 @@
     background-color: #333;
     color: #fff;
     padding: 10px 0;
-    
+    height: 80px;
 }
 
 .container {
@@ -179,13 +194,12 @@
 <nav class="navbar">
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
         <a class="navbar-brand" href="#">wheels.com</a>
-        <button class="logout-btn" onclick="logout()">Logout</button>
+        <a href="/login" class="btn btn-primary mb-3">Logout</a>
     </div>
 </nav>
 <div class="container">
     <div class="header">
-        <h1>Grab you Car</h1>
-      
+        <h1>Grab your Car</h1>
     </div>
 
     <div class="search-sort">
@@ -204,39 +218,60 @@
                 <th>Action</th>
             </tr>
         </thead>
-        <tbody>
-            <tr th:each="product : ${products}">
-                <td th:text="${product.brand}"></td>
-                <td th:text="${product.name}"></td>
-                <td> ₹<span th:text="${product.price}"></span></td>
-                <td><img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="100"></td>
-                <td th:text="${product.description}"></td>
-                <td>
-                    <button type="button" onclick="showPopup(this)">View More</button>
-                </td>
-            </tr>
-        </tbody>
+   <tbody>
+    <tr th:each="product : ${products}">
+        <td th:text="${product.brand}"></td>
+        <td th:text="${product.name}"></td>
+        <td> ₹<span th:text="${product.price}"></span></td>
+        <td><img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="100"></td>
+        <td th:text="${product.description}"></td>
+        <td>
+            <a th:href="@{/products/purchase(id=${product.id})}" class="btn btn-primary">Buy</a>
+        </td>
+    </tr>
+</tbody>
+
+
     </table>
 
     <!-- The popup box, small box, and message box remain the same -->
-     <div class="popup-box" id="popupBox">
-        <span class="close-button" onclick="closePopup()">×</span>
-        <center><h2 id="popupTitle"></h2>
-        <p id="popupBrand"></p>
-        <p id="popupPrice"></p>
-        <p id="popupDescription"></p>
-        <img id="popupImage" class="popup-img">
-        <button onclick="buy()">Buy</button></center>
-        
-    </div>
+   
 </div>
 
 <script>
-function logout() {
-    // Placeholder function for logout
-    console.log("Logout button clicked");
-    // Implement logout functionality here
+function buy(button) {
+    var row = button.parentNode.parentNode;
+    var productId = row.getElementsByTagName("td")[0].innerText; // Assuming the product ID is in the first column
+
+    // Prepare the data to be sent in the POST request body
+    var data = {
+        id: productId
+    };
+
+    // Send a POST request to the server to purchase the product
+    fetch('/products/purchase', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data) // Convert data to JSON format
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json(); // Assuming the server responds with JSON data
+        }
+        throw new Error('Network response was not ok.');
+    })
+    .then(data => {
+        // Handle the response data if needed
+        // For example, you can redirect to the purchase details page
+        window.location.href = '/purchase';
+    })
+    .catch(error => {
+        console.error('There was an error!', error);
+    });
 }
+
 
 function search() {
     // Get input value
@@ -280,32 +315,8 @@ function sortTable() {
     }
 }
 
-function showPopup(button) {
-    var row = button.parentNode.parentNode;
-    var brand = row.getElementsByTagName("td")[0].innerText;
-    var name = row.getElementsByTagName("td")[1].innerText;
-    var price = row.getElementsByTagName("td")[2].innerText;
-    var description = row.getElementsByTagName("td")[4].innerText;
-    var imageSrc = row.getElementsByTagName("img")[0].src;
 
-    document.getElementById("popupTitle").innerText = name;
-    document.getElementById("popupBrand").innerText = "Brand: " + brand;
-    document.getElementById("popupPrice").innerText = "Price: " + price;
-    document.getElementById("popupDescription").innerText = "Description: " + description;
-    document.getElementById("popupImage").src = imageSrc;
 
-    var popupBox = document.getElementById("popupBox");
-    popupBox.style.display = "block";
-}
-
-function closePopup() {
-    var popupBox = document.getElementById("popupBox");
-    popupBox.style.display = "none";
-}
-
-function buy() {
-    alert("Car has been booked!");
-}
 </script>
 </body>
 </html>

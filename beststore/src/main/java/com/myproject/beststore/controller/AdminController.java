@@ -13,6 +13,9 @@ import com.myproject.beststore.model.Admin;
 import com.myproject.beststore.model.User;
 import com.myproject.beststore.service.AdminRepository;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 public class AdminController {
@@ -35,6 +38,7 @@ public class AdminController {
     public String login(@RequestParam("username") String username, @RequestParam("password")String password,Model m) {
     	Admin a=repo.findByUsernameAndPassword(username, password);
     	if(a!=null) {
+    		
     		return "redirect:/products/ ";    				}
     	else {
     		m.addAttribute("status","Username not found!");

@@ -153,16 +153,37 @@ public class ProductController {
 		
 		return "redirect:/products";
 	}
+	
+	
+	@GetMapping("/purchase")
+	public String purchasePage(Model model, @RequestParam int id) {
+	    try {
+	        Product product = repo.findById(id).orElse(null);
+	        if (product == null) {
+	            return "redirect:/products";
+	        }
+	        model.addAttribute("product", product);
+	    } catch (Exception ex) {
+	        System.out.println("Exception: " + ex.getMessage());
+	        return "redirect:/products";
+	    }
+	    return "products/purchase";
+	}
 
+	@PostMapping("/confirm-purchase")
+    public String confirmPurchase(@RequestParam int id, RedirectAttributes redirectAttributes) {
+        try {
+            Product product = repo.findById(id).orElse(null);
+            if (product != null) {
+                repo.delete(product);
+                redirectAttributes.addFlashAttribute("successMessage", "Product purchased successfully");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Product not found");
+            }
+        } catch (Exception ex) {
+            System.out.println("Exception: " + ex.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to purchase product");
+        }
+        return "redirect:/view";
+    }
 }
-
-
-
-
-
-
-
-
-
-
-

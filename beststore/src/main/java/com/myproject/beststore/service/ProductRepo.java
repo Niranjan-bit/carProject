@@ -11,4 +11,6 @@ import com.myproject.beststore.model.User;
 public interface ProductRepo  extends JpaRepository<Product, Integer>{
 
 	void save(User user);
+	
+	
 }

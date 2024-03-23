@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,9 +20,16 @@ public class Product {
 	
 	@Column(columnDefinition = "TEXT")
 	private String description;
-	private String imageFileName;
+	private String image_file_name;
 	
-	
+	@ManyToOne
+	private User purchaser;
+	public User getPurchaser() {
+		return purchaser;
+	}
+	public void setPurchaser(User purchaser) {
+		this.purchaser = purchaser;
+	}
 	public int getId() {
 		return id;
 	}
@@ -53,9 +61,9 @@ public class Product {
 		this.description = description;
 	}
 	public String getImageFileName() {
-		return imageFileName;
+		return image_file_name;
 	}
 	public void setImageFileName(String imageFileName) {
-		this.imageFileName = imageFileName;
+		this.image_file_name = imageFileName;
 	}
 }
