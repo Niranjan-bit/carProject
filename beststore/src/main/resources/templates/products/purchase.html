@@ -13,21 +13,27 @@
         }
         h1 {
             color: #333;
+            font-weight: bold;
+            font-size: 25px;
             text-align: center;
             padding: 20px 0;
         }
-        p {
-            color: #666;
-            padding: 10px;
-            margin: 0;
-        }
         .product-details {
+            position: relative; /* Ensure the container is positioned */
             background-color: #fff;
             border-radius: 5px;
             margin: 20px auto;
             padding: 20px;
             width: 80%;
             box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .product-details img {
+            position: absolute; /* Position the image */
+            top: 10px; /* Adjust the top position */
+            right: 10px; /* Adjust the right position */
+            width: 100px; /* Set the width */
+            height: 100px; /* Set the height */
+            border-radius: 5px; /* Optional: Add border radius */
         }
         button {
             background-color: #4CAF50;
@@ -40,23 +46,27 @@
             margin: 4px 2px;
             cursor: pointer;
             border: none;
+            margin-top: 20px; /* Add some space below the image */
         }
     </style>
+     <script>
+        function showAlert() {
+            alert("Car has been bought successfully!");
+        }
+    </script>
 </head>
 <body>
     <h1>Purchase Product</h1>
     <div th:if="${product}" class="product-details">
-        <p>Product Details:</p>
+        <img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" alt="Product Image">
+        <p><h2>Product Details:</h2></p>
         <p>Brand: <span th:text="${product.brand}"></span></p>
         <p>Name: <span th:text="${product.name}"></span></p>
         <p>Price: ₹<span th:text="${product.price}"></span></p>
         <p>Description: <span th:text="${product.description}"></span></p>
-         <img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="200" alt="Product Image">
-   
-     <center><form th:action="@{/products/confirm-purchase(id=${product.id})}" method="post">
-            <button type="submit">Confirm Purchase</button>
-        </form></center> 
+        <form th:action="@{/products/confirm-purchase(id=${product.id})}" method="post">
+           <center> <button type="submit" onclick="showAlert()">Confirm Purchase</button></center>
+        </form>
     </div>
-   
 </body>
 </html>

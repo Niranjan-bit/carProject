@@ -20,7 +20,7 @@ public class Product {
 	
 	@Column(columnDefinition = "TEXT")
 	private String description;
-	private String image_file_name;
+	private String imageFileName;
 	
 	@ManyToOne
 	private User purchaser;
@@ -61,9 +61,9 @@ public class Product {
 		this.description = description;
 	}
 	public String getImageFileName() {
-		return image_file_name;
+		return imageFileName;
 	}
 	public void setImageFileName(String imageFileName) {
-		this.image_file_name = imageFileName;
+		this.imageFileName = imageFileName;
 	}
 }

@@ -1,3 +1,4 @@
+
 package com.myproject.beststore.controller;
 
 import java.io.File;
@@ -51,24 +52,35 @@ public class ProductController {
 	
 	@PostMapping("/create")
 	public String createProduct(
-			@Valid @ModelAttribute ProductDTO productDto,
-	        BindingResult result,  @RequestParam("imageFile") MultipartFile imageFile  // allows us to check if productDto has any validation errors
+	        @Valid @ModelAttribute ProductDTO productDto,
+	        BindingResult result,
+	        @RequestParam("imageFile") MultipartFile imageFile,
+	        RedirectAttributes redirectAttributes
 	) {
 	    if (result.hasErrors()) {
-	    	return "redirect:/products/create";
+	        return "redirect:/products/create";
 	    }
-	  
-	    
+
 	    Product product = new Product();
 	    product.setName(productDto.getName());
 	    product.setBrand(productDto.getBrand());
 	    product.setPrice(productDto.getPrice());
 	    product.setDescription(productDto.getDescription());
-	    
-	    repo.save(product); // this is used to save all the products in the repository
-	    
+
+	    // Save image file
+	    try {
+	        String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
+	        Files.write(Paths.get("/path/to/save/images/" + fileName), imageFile.getBytes());
+	        product.setImageFileName(fileName);
+	    } catch (IOException e) {
+	        e.printStackTrace(); // Handle file upload error
+	    }
+
+	    repo.save(product);
+
 	    return "redirect:/products";
 	}
+
 	
 	
 	@GetMapping("/edit")
