@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -181,6 +182,14 @@ public class ProductController {
 	    }
 	    return "products/purchase";
 	}
+	
+	
+	@GetMapping("/purchasedetails")
+	public String purchaseDetails() {
+	    return "products/purchasedetails";
+	}
+
+
 
 	@PostMapping("/confirm-purchase")
     public String confirmPurchase(@RequestParam int id, RedirectAttributes redirectAttributes) {

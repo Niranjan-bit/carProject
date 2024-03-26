@@ -17,14 +17,12 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Iterate over the purchased products -->
-                <tr th:each="product : ${purchasedProducts}">
+                <tr>
                     <td th:text="${product.brand}"></td>
                     <td th:text="${product.name}"></td>
                     <td th:text="${product.price}"></td>
                     <td th:text="${product.description}"></td>
-                    <!-- Assuming each product has a purchaser associated with it -->
-                    <td th:text="${product.purchaser.name}"></td>
+                    <td th:text="${username}"></td>
                 </tr>
             </tbody>
         </table>

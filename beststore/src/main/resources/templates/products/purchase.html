@@ -51,7 +51,7 @@
     </style>
      <script>
         function showAlert() {
-            alert("Car has been bought successfully!");
+            alert("Car has been booked successfully!");
         }
     </script>
 </head>
@@ -64,9 +64,10 @@
         <p>Name: <span th:text="${product.name}"></span></p>
         <p>Price: ₹<span th:text="${product.price}"></span></p>
         <p>Description: <span th:text="${product.description}"></span></p>
-        <form th:action="@{/products/confirm-purchase(id=${product.id})}" method="post">
-           <center> <button type="submit" onclick="showAlert()">Confirm Purchase</button></center>
-        </form>
+       <form th:action="@{/products/confirm-purchase}" method="post">
+    <input type="hidden" name="id" th:value="${product.id}" />
+    <center><button type="submit" onclick="showAlert()">Confirm Purchase</button></center>
+</form>
     </div>
 </body>
 </html>

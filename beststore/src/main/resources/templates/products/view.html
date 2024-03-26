@@ -9,7 +9,7 @@
             padding: 0;
             background-color: #f8f4ff;
         }
- .btn {
+        .btn {
             font-size: 16px;
             background-color: #4caf50;
             color: #fff;
@@ -17,55 +17,38 @@
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-
         .btn-primary {
-            background-color: red;
-            border-color: #4caf50;
+            background-color: #3498db;
         }
-
         .btn-primary:hover {
-            background-color: #45a049;
+            background-color: #2980b9;
         }
-
         .btn-danger {
-            background-color: #ff5252;
-            border-color: #ff5252;
+            background-color: #e74c3c;
         }
-
         .btn-danger:hover {
-            background-color: #ff1a1a;
+            background-color: #c0392b;
         }
-
         .container {
             max-width: 1200px;
             margin: 40px auto;
             padding: 20px;
         }
-
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
             margin-bottom: 20px;
         }
-
         .header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 32px;
             color: #333;
         }
-
-     
         .search-sort {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            float: right;
+            text-align: center;
             margin-bottom: 20px;
-            gap: 8px;
         }
-
         .search-input {
             width: 300px;
             padding: 10px;
@@ -73,21 +56,19 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
-
         .sort-btn {
+            font-size: 16px;
             background-color: #4caf50;
             color: #fff;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            transition: background-color 0.3s ease;
         }
-
         .sort-btn:hover {
             background-color: #45a049;
         }
-
         .product-table {
             width: 100%;
             border-collapse: collapse;
@@ -95,65 +76,51 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             background-color: #fff;
         }
-
         .product-table th, .product-table td {
             border: 1px solid #ddd;
             padding: 8px;
+            text-align: left;
         }
-
         .product-table th {
             background-color: #f2f2f2;
-            text-align: left;
-         
         }
-
-        .product-table tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-               height: 50px;
-        }
+        .product-table tbody tr:nth-child(even),
         .product-table tbody tr:nth-child(odd) {
             background-color: #f9f9f9;
-               height: 50px;
+            height: 50px;
         }
-        
         .navbar {
-    background-color: #333;
-    color: #fff;
-    padding: 10px 0;
-    height: 80px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.navbar-brand {
-    font-size: 25px;
-    color: #fff;
-    text-decoration: none;
-}
-
-.navbar-nav {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.nav-item {
-    display: inline-block;
-    margin-left: 10px;
-}
-
-.nav-link {
-    color: #fff;
-    text-decoration: none;
-}
-
-.nav-link:hover {
-    text-decoration: underline;
-}
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            height: 80px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .navbar-brand {
+            font-size: 25px;
+            color: #fff;
+            text-decoration: none;
+        }
+        .navbar-nav {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-item {
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .nav-link {
+            color: #fff;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -184,20 +151,18 @@
                 <th>Action</th>
             </tr>
         </thead>
-   <tbody>
-    <tr th:each="product : ${products}">
-        <td th:text="${product.brand}"></td>
-        <td th:text="${product.name}"></td>
-        <td> ₹<span th:text="${product.price}"></span></td>
-        <td><img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="100"></td>
-        <td th:text="${product.description}"></td>
-        <td>
-            <a th:href="@{/products/purchase(id=${product.id})}" class="btn btn-primary">Buy</a>
-        </td>
-    </tr>
-</tbody>
-
-
+        <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.brand}"></td>
+                <td th:text="${product.name}"></td>
+                <td> ₹<span th:text="${product.price}"></span></td>
+                <td><img th:src="@{/images/{fileName}(fileName=${product.imageFileName})}" width="100"></td>
+                <td th:text="${product.description}"></td>
+                <td>
+                    <a th:href="@{/products/purchase(id=${product.id})}" class="btn btn-primary">Buy</a>
+                </td>
+            </tr>
+        </tbody>
     </table>
 
     <!-- The popup box, small box, and message box remain the same -->
@@ -237,7 +202,6 @@ function buy(button) {
         console.error('There was an error!', error);
     });
 }
-
 
 function search() {
     // Get input value
