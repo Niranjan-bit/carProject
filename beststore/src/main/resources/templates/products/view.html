@@ -128,6 +128,7 @@
     <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
         <a class="navbar-brand" href="#">secondGear.com</a>
         <a href="/login" class="btn btn-primary mb-3">Logout</a>
+        
     </div>
 </nav>
 <div class="container">
@@ -170,38 +171,7 @@
 </div>
 
 <script>
-function buy(button) {
-    var row = button.parentNode.parentNode;
-    var productId = row.getElementsByTagName("td")[0].innerText; // Assuming the product ID is in the first column
 
-    // Prepare the data to be sent in the POST request body
-    var data = {
-        id: productId
-    };
-
-    // Send a POST request to the server to purchase the product
-    fetch('/products/purchase', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data) // Convert data to JSON format
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json(); // Assuming the server responds with JSON data
-        }
-        throw new Error('Network response was not ok.');
-    })
-    .then(data => {
-        // Handle the response data if needed
-        // For example, you can redirect to the purchase details page
-        window.location.href = '/purchase';
-    })
-    .catch(error => {
-        console.error('There was an error!', error);
-    });
-}
 
 function search() {
     // Get input value
