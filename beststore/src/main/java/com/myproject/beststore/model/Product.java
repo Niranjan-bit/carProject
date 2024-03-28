@@ -22,14 +22,7 @@ public class Product {
 	private String description;
 	private String imageFileName;
 	
-	@ManyToOne
-	private User purchaser;
-	public User getPurchaser() {
-		return purchaser;
-	}
-	public void setPurchaser(User purchaser) {
-		this.purchaser = purchaser;
-	}
+	
 	public int getId() {
 		return id;
 	}
