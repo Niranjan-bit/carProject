@@ -1,0 +1,394 @@
+The code is 
+
+
+
+package com.security.model;
+
+import java.util.Set;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "roles")
+public class Role {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String roleName;
+
+	@ManyToMany(mappedBy = "roles")
+	private Set<User> users;
+	
+	public Role(Long id, String roleName, Set<User> users) {
+		super();
+		this.id = id;
+		this.roleName = roleName;
+		this.users = users;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String name) {
+		this.roleName = name;
+	}
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
+
+
+}
+package com.security.model;
+
+import java.util.Set;
+
+import javax.management.relation.Role;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="users")
+public class User {
+	
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String username;
+	private String password;
+	private boolean enabled;
+	
+	
+	public User(Long id, String username, String password, boolean enabled, Set<Role> roles) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.enabled = enabled;
+		this.roles = roles;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public boolean isEnabled() {
+		return enabled;
+	}
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "user_roles",
+	joinColumns = @JoinColumn(name = "user_id"),
+	inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles;
+	
+	
+}
+package com.security.service;
+
+import java.util.Collection;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.security.model.User;
+
+public class MyUserDetails implements UserDetails{
+
+	private User user;
+	
+	public MyUserDetails(User user) {
+		this.user = user;
+	}
+	
+	
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		// TODO Auto-generated method stub
+		return user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());	}
+
+	@Override
+	public String getPassword() {
+		// TODO Auto-generated method stub
+		return user.getPassword();
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return user.getUsername();
+	}
+	
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+	
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+	
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+	
+	@Override
+	public boolean isEnabled() {
+		return user.isEnabled();
+	}
+}
+package com.security.service;
+
+import com.security.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
+import com.security.repo.UserRepo;
+
+public class UserDetailsServiceImpl implements UserDetailsService{
+
+	@Autowired
+	private UserRepo userRepo;
+	
+	
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		// TODO Auto-generated method stub
+		User user = userRepo.findByUsername(username);
+		if(user == null) {
+			throw new UsernameNotFoundException("User not found");
+		}
+		return new MyUserDetails(user);
+	}
+	
+
+}
+package com.security.repo;
+
+import javax.management.relation.Role;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RoleRepo  extends JpaRepository<Role, Long>{
+
+}
+package com.security.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.security.model.User;
+
+public interface UserRepo extends JpaRepository<User, Long>{
+	User findByUsername(String username);
+
+}
+package com.security.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+public class SecurityConfig{
+	
+	private final UserDetailsService userDetailsService;
+	
+	
+	public SecurityConfig(UserDetailsService userDetailsService) {
+		this.userDetailsService = userDetailsService;
+	}
+	
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+ 
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+ 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+ 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/", "/home", "/registration").permitAll()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .permitAll()
+            );
+ 
+return http.build();
+    }
+}
+
+
+
+
+
+
+error im having is 
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+_[32m :: Spring Boot :: _[39m              _[2m (v3.3.0)_[0;39m
+
+_[2m2024-06-19T13:01:03.279+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mc.security.SecurityExampleApplication   _[0;39m _[2m:_[0;39m Starting SecurityExampleApplication using Java 17.0.2 with PID 2820 (C:\Users\2321923\eclipse-workspace\SecurityExample\target\classes started by 2321923 in C:\Users\2321923\eclipse-workspace\SecurityExample)
+_[2m2024-06-19T13:01:03.281+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mc.security.SecurityExampleApplication   _[0;39m _[2m:_[0;39m No active profile set, falling back to 1 default profile: "default"
+_[2m2024-06-19T13:01:03.790+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36m.s.d.r.c.RepositoryConfigurationDelegate_[0;39m _[2m:_[0;39m Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+_[2m2024-06-19T13:01:03.848+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36m.s.d.r.c.RepositoryConfigurationDelegate_[0;39m _[2m:_[0;39m Finished Spring Data repository scanning in 52 ms. Found 2 JPA repository interfaces.
+_[2m2024-06-19T13:01:04.266+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.s.b.w.embedded.tomcat.TomcatWebServer _[0;39m _[2m:_[0;39m Tomcat initialized with port 8080 (http)
+_[2m2024-06-19T13:01:04.276+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.apache.catalina.core.StandardService  _[0;39m _[2m:_[0;39m Starting service [Tomcat]
+_[2m2024-06-19T13:01:04.276+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.apache.catalina.core.StandardEngine   _[0;39m _[2m:_[0;39m Starting Servlet engine: [Apache Tomcat/10.1.24]
+_[2m2024-06-19T13:01:04.324+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.a.c.c.C.[Tomcat].[localhost].[/]      _[0;39m _[2m:_[0;39m Initializing Spring embedded WebApplicationContext
+_[2m2024-06-19T13:01:04.325+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mw.s.c.ServletWebServerApplicationContext_[0;39m _[2m:_[0;39m Root WebApplicationContext: initialization completed in 995 ms
+_[2m2024-06-19T13:01:04.439+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.hibernate.jpa.internal.util.LogHelper _[0;39m _[2m:_[0;39m HHH000204: Processing PersistenceUnitInfo [name: default]
+_[2m2024-06-19T13:01:04.483+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36morg.hibernate.Version                   _[0;39m _[2m:_[0;39m HHH000412: Hibernate ORM core version 6.5.2.Final
+_[2m2024-06-19T13:01:04.513+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.h.c.internal.RegionFactoryInitiator   _[0;39m _[2m:_[0;39m HHH000026: Second-level cache disabled
+_[2m2024-06-19T13:01:04.758+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.s.o.j.p.SpringPersistenceUnitInfo     _[0;39m _[2m:_[0;39m No LoadTimeWeaver setup: ignoring JPA class transformer
+_[2m2024-06-19T13:01:04.780+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mcom.zaxxer.hikari.HikariDataSource      _[0;39m _[2m:_[0;39m HikariPool-1 - Starting...
+_[2m2024-06-19T13:01:05.011+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mcom.zaxxer.hikari.pool.HikariPool       _[0;39m _[2m:_[0;39m HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@311a0b3e
+_[2m2024-06-19T13:01:05.013+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mcom.zaxxer.hikari.HikariDataSource      _[0;39m _[2m:_[0;39m HikariPool-1 - Start completed.
+_[2m2024-06-19T13:01:05.227+05:30_[0;39m _[31mERROR_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mj.LocalContainerEntityManagerFactoryBean_[0;39m _[2m:_[0;39m Failed to initialize JPA EntityManagerFactory: Association 'com.security.model.User.roles' targets the type 'javax.management.relation.Role' which is not an '@Entity' type
+_[2m2024-06-19T13:01:05.228+05:30_[0;39m _[33m WARN_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mConfigServletWebServerApplicationContext_[0;39m _[2m:_[0;39m Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Association 'com.security.model.User.roles' targets the type 'javax.management.relation.Role' which is not an '@Entity' type
+_[2m2024-06-19T13:01:05.228+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mcom.zaxxer.hikari.HikariDataSource      _[0;39m _[2m:_[0;39m HikariPool-1 - Shutdown initiated...
+_[2m2024-06-19T13:01:05.290+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mcom.zaxxer.hikari.HikariDataSource      _[0;39m _[2m:_[0;39m HikariPool-1 - Shutdown completed.
+_[2m2024-06-19T13:01:05.292+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.apache.catalina.core.StandardService  _[0;39m _[2m:_[0;39m Stopping service [Tomcat]
+_[2m2024-06-19T13:01:05.301+05:30_[0;39m _[32m INFO_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36m.s.b.a.l.ConditionEvaluationReportLogger_[0;39m _[2m:_[0;39m 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+_[2m2024-06-19T13:01:05.316+05:30_[0;39m _[31mERROR_[0;39m _[35m2820_[0;39m _[2m---_[0;39m _[2m[SecurityExample] [           main]_[0;39m _[2m_[0;39m_[36mo.s.boot.SpringApplication              _[0;39m _[2m:_[0;39m Application run failed
+
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Association 'com.security.model.User.roles' targets the type 'javax.management.relation.Role' which is not an '@Entity' type
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1788) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:600) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:952) ~[spring-context-6.1.8.jar:6.1.8]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624) ~[spring-context-6.1.8.jar:6.1.8]
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.0.jar:3.3.0]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.0.jar:3.3.0]
+	at com.security.SecurityExampleApplication.main(SecurityExampleApplication.java:10) ~[classes/:na]
+Caused by: org.hibernate.AnnotationException: Association 'com.security.model.User.roles' targets the type 'javax.management.relation.Role' which is not an '@Entity' type
+	at org.hibernate.boot.model.internal.CollectionBinder.detectManyToManyProblems(CollectionBinder.java:2607) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.model.internal.CollectionBinder.bindManyToManySecondPass(CollectionBinder.java:2176) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.model.internal.CollectionBinder.bindStarToManySecondPass(CollectionBinder.java:1621) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.model.internal.CollectionBinder$1.secondPass(CollectionBinder.java:1605) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.model.internal.CollectionSecondPass.doSecondPass(CollectionSecondPass.java:45) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processSecondPasses(InFlightMetadataCollectorImpl.java:1811) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.processSecondPasses(InFlightMetadataCollectorImpl.java:1770) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:334) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1431) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1502) ~[hibernate-core-6.5.2.Final.jar:6.5.2.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:75) ~[spring-orm-6.1.8.jar:6.1.8]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.1.8.jar:6.1.8]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:409) ~[spring-orm-6.1.8.jar:6.1.8]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:396) ~[spring-orm-6.1.8.jar:6.1.8]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1835) ~[spring-beans-6.1.8.jar:6.1.8]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1784) ~[spring-beans-6.1.8.jar:6.1.8]
+	... 15 common frames omitted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
